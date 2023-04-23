@@ -123,7 +123,6 @@ class Game:
             }
             if not is_end:
                 move = players[current_player - 1].get_move(board,
-                                                            player=current_player,
                                                             possible_moves=possible_moves,
                                                             start_coord=(start_x, start_y),
                                                             update_callback=lambda e: self.update(e, **update_info))
