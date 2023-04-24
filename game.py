@@ -79,7 +79,7 @@ class Game:
 
     def game_loop(self):
         theme = pygame_menu.themes.THEME_DARK
-        theme.widget_margin = ((self.screen_width / 2) * -0.7, 0)
+        theme.widget_margin = ((self.screen_width / 2) * 0.7, 0)
         game_menu = pygame_menu.Menu(
             title=self.game_type[0],
             theme=theme,
