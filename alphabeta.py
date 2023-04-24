@@ -19,7 +19,7 @@ class State:
         pass
 
 
-DEPTH = 6
+DEPTH = 4
 
 
 def max_value(state, alpha=float('-inf'), beta=float('inf'), depth=DEPTH):
