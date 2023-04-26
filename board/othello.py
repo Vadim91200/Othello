@@ -20,18 +20,17 @@ class Othello(Board):
     def valid_move(self, move, player=None):
         if not super().valid_move(move):
             return False
-
+        if self.board[move] != const.EMPTY_CELL:
+            return False
         opponent = 1 + player % 2
         directions = [(dx, dy) for dx in range(-1, 2) for dy in range(-1, 2) if dx != 0 or dy != 0]
 
         for dx, dy in directions:
             nx, ny = move[0] + dx, move[1] + dy
-
             if 0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx][ny] == opponent:
                 while 0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx][ny] != const.EMPTY_CELL:
                     nx += dx
                     ny += dy
-
                     if 0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx][ny] == player:
                         return True
 
@@ -52,6 +51,26 @@ class Othello(Board):
 
     def apply_move(self, move, player):
         self.board[move] = player
+        opponent = 1 + player % 2
+        # Get the row and column of the move
+        row, col = move
 
+        # Set the new board position to the player's color
+
+        # Flip any opponent pieces that are sandwiched between the new piece and
+        # another of the player's pieces in any direction
+        for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1)]:
+            nx, ny = move[0] + dx, move[1] + dy
+            to_flip = []
+            if 0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx, ny] == opponent:
+                while 0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx, ny] == opponent:
+                    to_flip.append((nx, ny))
+                    nx += dx
+                    ny += dy
+                if 0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx, ny] != player:
+                    to_flip.clear()
+            for flip_row, flip_col in to_flip:
+                self.board[flip_row, flip_col] = player
+        return self
     def copy(self):
         return Othello(self.board.copy())

@@ -122,6 +122,9 @@ class Game:
                 'assets': assets
             }
             if not is_end:
+                if len(possible_moves) == 0:
+                    current_player = 1 + current_player % 2
+                    continue
                 move = players[current_player - 1].get_move(board,
                                                             possible_moves=possible_moves,
                                                             start_coord=(start_x, start_y),
