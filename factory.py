@@ -7,7 +7,7 @@ import pygame
 
 def asset_factory(game_type):
     if game_type == 1:
-        return pygame.image.load('asset/othello_player_2.png'), pygame.image.load('asset/othello_player_1.png'), \
+        return pygame.image.load('asset/othello_player_1.png'), pygame.image.load('asset/othello_player_2.png'), \
             pygame.image.load('asset/playable_tile.png')
 
     elif game_type == 2:
