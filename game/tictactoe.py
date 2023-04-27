@@ -1,4 +1,4 @@
-from generic_board import Board
+from generic_game import Game
 import const
 import numpy as np
 
@@ -8,10 +8,10 @@ LOSS = -1000.0
 DRAW = 0.0
 
 
-class Tictactoe(Board):
+class Tictactoe(Game):
 
     def __init__(self, board=None):
-        super().__init__(SIZE, board)
+        super().__init__(SIZE, False, board)
 
     def valid_move(self, move, player=None):
         return super().valid_move(move) and self.board[move] == const.EMPTY_CELL

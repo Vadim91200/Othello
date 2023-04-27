@@ -1,6 +1,6 @@
 EMPTY_CELL = 0
 PLAYABLE_TILE_INDEX = -1
-TILE_SIZE = 96
+TILE_SIZE = 80
 FPS = 60
 FIRST_PLAYER = 1
 SECOND_PLAYER = 2
@@ -10,6 +10,7 @@ TICTACTOE = ('Tictactoe', 2)
 OTHELLO = ('Othello', 1)
 PLAYER_TYPES = [HUMAN, IA]
 GAME_MODES = [OTHELLO, TICTACTOE]
-YELLOW_TILE = (242, 228, 191)
 PURPLE_TILE = (206, 169, 245)
-COLOR_SWITCH = [YELLOW_TILE, PURPLE_TILE]
+BORDER_COLOR = (54, 54, 54)
+OTHELLO_ASSETS_PATH = ('asset/othello_player_1.png', 'asset/othello_player_2.png', 'asset/playable_tile.png')
+TICTACTOE_ASSETS_PATH = ('asset/tictactoe_player_1.png', 'asset/tictactoe_player_2.png', 'asset/playable_tile.png')

@@ -1,21 +1,18 @@
-from board.tictactoe import Tictactoe
-from board.othello import Othello
+import const
+from game.tictactoe import Tictactoe
+from game.othello import Othello
 from player.human_player import HumanPlayer
 from player.ia_player import IaPlayer
-import pygame
 
 
 def asset_factory(game_type):
     if game_type == 1:
-        return pygame.image.load('asset/othello_player_1.png'), pygame.image.load('asset/othello_player_2.png'), \
-            pygame.image.load('asset/playable_tile.png')
-
+        return const.OTHELLO_ASSETS_PATH
     elif game_type == 2:
-        return pygame.image.load('asset/tictactoe_player_1.png'), pygame.image.load('asset/tictactoe_player_2.png'), \
-            pygame.image.load('asset/playable_tile.png')
+        return const.TICTACTOE_ASSETS_PATH
 
 
-def board_factory(game_type):
+def game_factory(game_type):
     if game_type == 1:
         return Othello()
     elif game_type == 2:
