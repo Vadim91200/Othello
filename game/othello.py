@@ -1,4 +1,4 @@
-from generic_board import Board
+from generic_game import Game
 import const
 import numpy as np
 
@@ -8,9 +8,9 @@ LOSS = -1000.0
 DRAW = 0.0
 
 
-class Othello(Board):
+class Othello(Game):
     def __init__(self, board=None):
-        super().__init__(SIZE, board)
+        super().__init__(SIZE, True, board)
         mid = SIZE // 2
         self.board[mid - 1, mid - 1] = const.SECOND_PLAYER
         self.board[mid - 1, mid] = const.FIRST_PLAYER
@@ -52,13 +52,6 @@ class Othello(Board):
     def apply_move(self, move, player):
         self.board[move] = player
         opponent = 1 + player % 2
-        # Get the row and column of the move
-        row, col = move
-
-        # Set the new board position to the player's color
-
-        # Flip any opponent pieces that are sandwiched between the new piece and
-        # another of the player's pieces in any direction
         for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1)]:
             nx, ny = move[0] + dx, move[1] + dy
             to_flip = []
@@ -67,10 +60,11 @@ class Othello(Board):
                     to_flip.append((nx, ny))
                     nx += dx
                     ny += dy
-                if 0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx, ny] != player:
+                if 0 > nx >= SIZE and 0 > ny >= SIZE or self.board[nx, ny] != player:
                     to_flip.clear()
             for flip_row, flip_col in to_flip:
                 self.board[flip_row, flip_col] = player
         return self
+
     def copy(self):
         return Othello(self.board.copy())

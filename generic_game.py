@@ -2,10 +2,11 @@ from alphabeta import State
 import numpy as np
 
 
-class Board(State):
+class Game(State):
 
-    def __init__(self, size, board=None):
+    def __init__(self, size, live_score, board=None):
         self.size = size
+        self.live_score = live_score
         if board is None:
             self.board = np.zeros((size, size), dtype=int)
         else:
