@@ -37,8 +37,8 @@ class GUI:
         def set_game_type(selected_item, *_):
             self.game_type = selected_item[0]
 
-        self.main_menu.add.selector(title='Joueur 1 : ', items=const.PLAYER_TYPES, onchange=set_player1)
-        self.main_menu.add.selector(title='Joueur 2 : ', items=const.PLAYER_TYPES, onchange=set_player2)
+        self.main_menu.add.selector(title='Noir : ', items=const.PLAYER_TYPES, onchange=set_player1)
+        self.main_menu.add.selector(title='Blanc : ', items=const.PLAYER_TYPES, onchange=set_player2)
         self.main_menu.add.selector(title='Mode de jeux : ', items=const.GAME_MODES, onchange=set_game_type)
         self.main_menu.add.button('Jouer', self.game_loop)
         self.main_menu.add.button('Quitter', pygame_menu.events.EXIT)
@@ -62,7 +62,7 @@ class GUI:
 
     def announce_score(self, player=None):
         font = pygame.font.Font(None, 80)
-        text = f'Le joueur {player} gagne la partie !' if player else 'Match nul !'
+        text = f'Le joueur noir gagne la partie' if player == 1 else 'Le joueur blanc gagne la partie' if player else 'Match nul !'
         text_surface = font.render(text, True, (255, 255, 255), (0, 0, 0))
         text_x = (self.surface.get_width() - text_surface.get_width()) // 2
         text_y = (self.surface.get_height() - text_surface.get_height()) // 2
