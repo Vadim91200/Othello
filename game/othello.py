@@ -60,7 +60,7 @@ class Othello(Game):
                     to_flip.append((nx, ny))
                     nx += dx
                     ny += dy
-                if not (0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx, ny] == player):
+                if 0 > nx >= SIZE and 0 > ny >= SIZE or self.board[nx, ny] != player:
                     to_flip.clear()
             for flip_row, flip_col in to_flip:
                 self.board[flip_row, flip_col] = player

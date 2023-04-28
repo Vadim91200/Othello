@@ -1,6 +1,6 @@
 import const
 import random
-import time
+
 
 class State:
     def get_all_moves(self, player):
@@ -66,16 +66,6 @@ def min_value(state, alpha=float('-inf'), beta=float('inf'), depth=DEPTH):
 
     return v, best_move
 
-def timer_decorator(func):
-    def wrapper(*args, **kwargs):
-        start_time = time.time()
-        result = func(*args, **kwargs)
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        print(f"{func.__name__} took {elapsed_time:.5f} seconds to execute.")
-        return result
-    return wrapper
 
-@timer_decorator
 def alphabeta_search(state, player):
     return max_value(state)[1] if player == const.FIRST_PLAYER else min_value(state)[1]
