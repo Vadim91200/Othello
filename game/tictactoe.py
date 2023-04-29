@@ -17,17 +17,17 @@ class Tictactoe(Game):
         return super().valid_move(move) and self.board[move] == const.EMPTY_CELL
 
     def check_win(self, player):
-        for row in range(SIZE):
-            if np.all(self.board[row, :] == player):
-                return True
+        check = self.board == player
 
-        for col in range(SIZE):
-            if np.all(self.board[:, col] == player):
-                return True
-
-        if np.all(self.board.diagonal() == player):
+        if np.any(check.all(axis=1)):
             return True
-        if np.all(np.fliplr(self.board).diagonal() == player):
+
+        if np.any(check.all(axis=0)):
+            return True
+
+        if (self.board.diagonal() == player).all():
+            return True
+        if (np.fliplr(self.board).diagonal() == player).all():
             return True
 
         return False

@@ -62,7 +62,7 @@ class GUI:
 
     def announce_score(self, player=None):
         font = pygame.font.Font(None, 80)
-        text = f'Le joueur noir gagne la partie' if player == 1 else 'Le joueur blanc gagne la partie' if player else 'Match nul !'
+        text = f'Le joueur 1 gagne la partie' if player == 1 else 'Le joueur 2 gagne la partie' if player else 'Match nul !'
         text_surface = font.render(text, True, (255, 255, 255), (0, 0, 0))
         text_x = (self.surface.get_width() - text_surface.get_width()) // 2
         text_y = (self.surface.get_height() - text_surface.get_height()) // 2
@@ -80,7 +80,7 @@ class GUI:
 
     def game_loop(self):
         assets_path = asset_factory(self.game_type[1])
-        _game = game_factory(self.game_type[1])
+        played_game = game_factory(self.game_type[1])
         players = [player_factory(self.player1[1], const.FIRST_PLAYER),
                    player_factory(self.player2[1], const.SECOND_PLAYER)]
         assets = [pygame.image.load(path) for path in assets_path]
@@ -98,18 +98,18 @@ class GUI:
 
         player_1_score = None
         player_2_score = None
-        if _game.live_score:
+        if played_game.live_score:
             game_menu.add.label('score')
             frame1 = game_menu.add.frame_h(180, 110)
             frame1.pack(game_menu.add.image(assets_path[0]).set_margin(0, 0))
             player_1_score = frame1.pack(
-                game_menu.add.label(np.count_nonzero(_game.board == const.FIRST_PLAYER)).set_margin(0, 0),
+                game_menu.add.label(np.count_nonzero(played_game.board == const.FIRST_PLAYER)).set_margin(0, 0),
                 vertical_position=pygame_menu.locals.POSITION_CENTER)
 
             frame2 = game_menu.add.frame_h(180, 110)
             frame2.pack(game_menu.add.image(assets_path[1]).set_margin(0, 0), align=pygame_menu.locals.ALIGN_LEFT)
             player_2_score = frame2.pack(
-                game_menu.add.label(np.count_nonzero(_game.board == const.FIRST_PLAYER)).set_margin(0, 0),
+                game_menu.add.label(np.count_nonzero(played_game.board == const.FIRST_PLAYER)).set_margin(0, 0),
                 vertical_position=pygame_menu.locals.POSITION_CENTER)
 
             game_menu.add.vertical_margin(10)
@@ -117,7 +117,7 @@ class GUI:
         game_menu.add.button('Rejouer', self.game_loop)
         game_menu.add.button('Menu principal', self.run)
 
-        total_size = _game.size * const.TILE_SIZE
+        total_size = played_game.size * const.TILE_SIZE
         start_x = (self.surface.get_width() - total_size) / 2
         start_y = (self.surface.get_height() - total_size) / 2
 
@@ -127,7 +127,7 @@ class GUI:
             self.clock.tick(const.FPS)
 
             events = pygame.event.get()
-            possible_moves = _game.get_all_moves(current_player)
+            possible_moves = played_game.get_all_moves(current_player)
 
             for event in events:
                 if event.type == pygame.QUIT:
@@ -136,7 +136,7 @@ class GUI:
             update_info = {
                 'score': (is_end, winner),
                 'menu': game_menu,
-                'game': _game,
+                'game': played_game,
                 'start_xy': (start_x, start_y),
                 'possible_moves': possible_moves,
                 'assets': assets
@@ -145,20 +145,20 @@ class GUI:
                 if len(possible_moves) == 0:
                     current_player = 1 + current_player % 2
                     continue
-                move = players[current_player - 1].get_move(_game,
+                move = players[current_player - 1].get_move(played_game,
                                                             possible_moves=possible_moves,
                                                             start_coord=(start_x, start_y),
                                                             update_callback=lambda e: self.update(e, **update_info))
-                _game.apply_move(move, current_player)
+                played_game.apply_move(move, current_player)
 
-                if _game.live_score:
-                    player_1_score.set_title(str(np.count_nonzero(_game.board == const.FIRST_PLAYER)))
-                    player_2_score.set_title(str(np.count_nonzero(_game.board == const.SECOND_PLAYER)))
+                if played_game.live_score:
+                    player_1_score.set_title(str(np.count_nonzero(played_game.board == const.FIRST_PLAYER)))
+                    player_2_score.set_title(str(np.count_nonzero(played_game.board == const.SECOND_PLAYER)))
 
-                if _game.is_end():
-                    if _game.check_win(const.FIRST_PLAYER):
+                if played_game.is_end():
+                    if played_game.check_win(const.FIRST_PLAYER):
                         winner = const.FIRST_PLAYER
-                    elif _game.check_win(const.SECOND_PLAYER):
+                    elif played_game.check_win(const.SECOND_PLAYER):
                         winner = const.SECOND_PLAYER
                     is_end = True
 
