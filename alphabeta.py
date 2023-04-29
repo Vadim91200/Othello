@@ -1,6 +1,8 @@
+import cProfile
+import io
+import pstats
 import const
 import random
-import time
 
 class State:
     def get_all_moves(self, player):
@@ -68,11 +70,15 @@ def min_value(state, alpha=float('-inf'), beta=float('inf'), depth=DEPTH):
 
 def timer_decorator(func):
     def wrapper(*args, **kwargs):
-        start_time = time.time()
+        pr = cProfile.Profile()
+        pr.enable()
         result = func(*args, **kwargs)
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        print(f"{func.__name__} took {elapsed_time:.5f} seconds to execute.")
+        pr.disable()
+        s= io.StringIO()
+        sortBy = "cumulative"
+        ps = pstats.Stats(pr, stream=s).sort_stats((sortBy))
+        ps.print_stats()
+        print(s.getvalue())
         return result
     return wrapper
 
