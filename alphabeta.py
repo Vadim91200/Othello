@@ -4,6 +4,7 @@ import pstats
 import const
 import random
 
+
 class State:
     def get_all_moves(self, player):
         pass
@@ -32,7 +33,6 @@ def max_value(state, alpha=float('-inf'), beta=float('inf'), depth=DEPTH):
     best_move = None
 
     all_moves = state.get_all_moves(const.FIRST_PLAYER)
-    random.shuffle(all_moves)
     for move in all_moves:
         next_state = state.copy().apply_move(tuple(move), const.FIRST_PLAYER)
         e, _ = min_value(next_state, alpha, beta, depth - 1)
@@ -54,7 +54,6 @@ def min_value(state, alpha=float('-inf'), beta=float('inf'), depth=DEPTH):
     v = float('inf')
     best_move = None
     all_moves = state.get_all_moves(const.SECOND_PLAYER)
-    random.shuffle(all_moves)
     for move in all_moves:
         next_state = state.copy().apply_move(move, const.SECOND_PLAYER)
         e, _ = max_value(next_state, alpha, beta, depth - 1)
@@ -68,19 +67,18 @@ def min_value(state, alpha=float('-inf'), beta=float('inf'), depth=DEPTH):
 
     return v, best_move
 
+
 def timer_decorator(func):
     def wrapper(*args, **kwargs):
         pr = cProfile.Profile()
         pr.enable()
         result = func(*args, **kwargs)
         pr.disable()
-        s= io.StringIO()
-        sortBy = "cumulative"
-        ps = pstats.Stats(pr, stream=s).sort_stats((sortBy))
-        ps.print_stats()
-        print(s.getvalue())
+        pr.print_stats()
         return result
+
     return wrapper
+
 
 @timer_decorator
 def alphabeta_search(state, player):
