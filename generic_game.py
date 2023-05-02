@@ -4,7 +4,8 @@ import numpy as np
 
 class Game(State):
 
-    def __init__(self, size, live_score, board=None):
+    def __init__(self, size, live_score, depth, board=None):
+        super().__init__(depth)
         self.size = size
         self.live_score = live_score
         if board is None:

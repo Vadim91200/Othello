@@ -10,9 +10,12 @@ class HumanPlayer(Player):
 
     def get_move(self, board, **kwargs):
         update_callback = kwargs['update_callback']
-        start_x, start_y = kwargs['start_coord']
-        possible_moves = kwargs['possible_moves']
         clock = pygame.time.Clock()
+
+        total_size = board.size * const.TILE_SIZE
+        start_x = (const.SCREEN_WIDTH - total_size) / 2
+        start_y = (const.SCREEN_HEIGHT - total_size) / 2
+        possible_moves = board.get_all_moves(self.player_number)
 
         while True:
             clock.tick(const.FPS)
