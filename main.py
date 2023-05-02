@@ -5,13 +5,22 @@ from factory import game_factory, player_factory, asset_factory
 
 import pygame
 import pygame_menu
+PLAYABLE_TILE_INDEX = -1
+HUMAN = ('Humain', 1)
+IA = ('IA', 2)
+TICTACTOE = ('Tictactoe', 2)
+OTHELLO = ('Othello', 1)
+PLAYER_TYPES = [HUMAN, IA]
+GAME_MODES = [OTHELLO, TICTACTOE]
+PURPLE_TILE = (206, 169, 245)
+BORDER_COLOR = (54, 54, 54)
 
 
 class GUI:
     def __init__(self):
         pygame.init()
         self.clock = pygame.time.Clock()
-        self.surface = pygame.display.set_mode((1280, 720))
+        self.surface = pygame.display.set_mode((const.SCREEN_WIDTH, const.SCREEN_HEIGHT))
         display_info = pygame.display.Info()
         self.screen_width = display_info.current_w
         self.screen_height = display_info.current_h
@@ -24,9 +33,9 @@ class GUI:
             height=self.screen_height,
         )
 
-        self.player1 = const.HUMAN
-        self.player2 = const.HUMAN
-        self.game_type = const.OTHELLO
+        self.player1 = HUMAN
+        self.player2 = HUMAN
+        self.game_type = OTHELLO
 
         def set_player1(selected_item, *_):
             self.player1 = selected_item[0]
@@ -37,9 +46,9 @@ class GUI:
         def set_game_type(selected_item, *_):
             self.game_type = selected_item[0]
 
-        self.main_menu.add.selector(title='Noir : ', items=const.PLAYER_TYPES, onchange=set_player1)
-        self.main_menu.add.selector(title='Blanc : ', items=const.PLAYER_TYPES, onchange=set_player2)
-        self.main_menu.add.selector(title='Mode de jeux : ', items=const.GAME_MODES, onchange=set_game_type)
+        self.main_menu.add.selector(title='Joueur 1 : ', items=PLAYER_TYPES, onchange=set_player1)
+        self.main_menu.add.selector(title='Joueur 2 : ', items=PLAYER_TYPES, onchange=set_player2)
+        self.main_menu.add.selector(title='Mode de jeux : ', items=GAME_MODES, onchange=set_game_type)
         self.main_menu.add.button('Jouer', self.game_loop)
         self.main_menu.add.button('Quitter', pygame_menu.events.EXIT)
 
@@ -52,13 +61,13 @@ class GUI:
                 x = row * const.TILE_SIZE + start_xy[0]
                 y = col * const.TILE_SIZE + start_xy[1]
                 rect = pygame.Rect(x, y, const.TILE_SIZE, const.TILE_SIZE)
-                pygame.draw.rect(self.surface, const.PURPLE_TILE, rect, border_radius=5)
-                pygame.draw.rect(self.surface, const.BORDER_COLOR, rect, 2, border_radius=5)
+                pygame.draw.rect(self.surface, PURPLE_TILE, rect, border_radius=5)
+                pygame.draw.rect(self.surface, BORDER_COLOR, rect, 2, border_radius=5)
                 cell = board.board[row, col]
                 if cell != const.EMPTY_CELL:
                     self.surface.blit(asset[cell - 1], (x, y))
                 elif (row, col) in possible_moves:
-                    self.surface.blit(asset[const.PLAYABLE_TILE_INDEX], (x, y))
+                    self.surface.blit(asset[PLAYABLE_TILE_INDEX], (x, y))
 
     def announce_score(self, player=None):
         font = pygame.font.Font(None, 80)
@@ -84,7 +93,7 @@ class GUI:
         players = [player_factory(self.player1[1], const.FIRST_PLAYER),
                    player_factory(self.player2[1], const.SECOND_PLAYER)]
         assets = [pygame.image.load(path) for path in assets_path]
-        current_player = 1
+        current_player = const.FIRST_PLAYER
 
         theme = pygame_menu.themes.THEME_DARK
         theme.background_color = (54, 54, 54)
@@ -123,12 +132,10 @@ class GUI:
 
         is_end = False
         winner = None
+        possible_moves = played_game.get_all_moves(const.FIRST_PLAYER)
         while True:
             self.clock.tick(const.FPS)
-
             events = pygame.event.get()
-            possible_moves = played_game.get_all_moves(current_player)
-
             for event in events:
                 if event.type == pygame.QUIT:
                     exit()
@@ -141,14 +148,12 @@ class GUI:
                 'possible_moves': possible_moves,
                 'assets': assets
             }
-            if not is_end:
-                if len(possible_moves) == 0:
-                    current_player = 1 + current_player % 2
-                    continue
+            self.update(events, **update_info)
+
+            if not is_end and len(possible_moves) > 0:
                 move = players[current_player - 1].get_move(played_game,
-                                                            possible_moves=possible_moves,
-                                                            start_coord=(start_x, start_y),
                                                             update_callback=lambda e: self.update(e, **update_info))
+
                 played_game.apply_move(move, current_player)
 
                 if played_game.live_score:
@@ -162,8 +167,8 @@ class GUI:
                         winner = const.SECOND_PLAYER
                     is_end = True
 
-            self.update(events, **update_info)
             current_player = 1 + current_player % 2
+            possible_moves = played_game.get_all_moves(current_player)
 
 
 if __name__ == '__main__':
