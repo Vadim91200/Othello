@@ -4,10 +4,10 @@ import numpy as np
 
 class Game(State):
 
-    def __init__(self, size, live_score, depth, board=None):
+    def __init__(self, size, depth, show_live_score=False, board=None):
         super().__init__(depth)
         self.size = size
-        self.live_score = live_score
+        self.show_live_score = show_live_score
         if board is None:
             self.board = np.zeros((size, size), dtype=int)
         else:

@@ -5,6 +5,7 @@ from factory import game_factory, player_factory, asset_factory
 
 import pygame
 import pygame_menu
+
 PLAYABLE_TILE_INDEX = -1
 HUMAN = ('Humain', 1)
 IA = ('IA', 2)
@@ -107,8 +108,8 @@ class GUI:
 
         player_1_score = None
         player_2_score = None
-        if played_game.live_score:
-            game_menu.add.label('score')
+        if played_game.show_live_score:
+            game_menu.add.label('Score:', underline=True)
             frame1 = game_menu.add.frame_h(180, 110)
             frame1.pack(game_menu.add.image(assets_path[0]).set_margin(0, 0))
             player_1_score = frame1.pack(
@@ -156,7 +157,7 @@ class GUI:
 
                 played_game.apply_move(move, current_player)
 
-                if played_game.live_score:
+                if played_game.show_live_score:
                     player_1_score.set_title(str(np.count_nonzero(played_game.board == const.FIRST_PLAYER)))
                     player_2_score.set_title(str(np.count_nonzero(played_game.board == const.SECOND_PLAYER)))
 
