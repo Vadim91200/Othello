@@ -17,12 +17,12 @@ CORNER_SCORE = [2000.0, 2000.0, 0]
 EGDE_MAGNITUDE = [50, 50, 0]
 
 cache = {}
-DEPTH = 4
+DEPTH = 5
 
 
 class Othello(Game):
     def __init__(self, board=None):
-        super().__init__(SIZE, True, DEPTH, board)
+        super().__init__(SIZE, DEPTH, True, board)
         mid = SIZE // 2
         if board is None:
             self.board[mid - 1, mid - 1] = const.SECOND_PLAYER

@@ -14,7 +14,7 @@ DEPTH = 6
 class Tictactoe(Game):
 
     def __init__(self, board=None):
-        super().__init__(SIZE, False, DEPTH, board)
+        super().__init__(SIZE, DEPTH, False, board)
 
     def valid_move(self, move, player=None):
         return super().valid_move(move) and self.board[move] == const.EMPTY_CELL
