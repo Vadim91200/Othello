@@ -2,27 +2,38 @@ from generic_game import Game
 import const
 import numpy as np
 
+DIRECTIONS = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1)]
+WEIGHT_MAP = np.array([
+    [100, -25, 20, 10, 10, 20, -25, 100],
+    [-25, -25, 5, 5, 5, 5, -25, -25],
+    [20, 5, 15, 3, 3, 15, 5, 20],
+    [10, 5, 3, 3, 3, 3, 5, 10],
+    [10, 5, 3, 3, 3, 3, 5, 10],
+    [20, 5, 15, 3, 3, 15, 5, 20],
+    [-25, -25, 5, 5, 5, 5, -25, -25],
+    [100, -25, 20, 10, 10, 20, -25, 100]
+])
+
 SIZE = 8
 WIN = 100000000.0
 LOSS = -100000000.0
 DRAW = 0.0
-
 EARLY_GAME = 0
 MID_GAME = 1
 END_GAME = 2
-NUMBER_OF_PIECE_MAGNITUDE = [0, 0, 4]
-MOBILITY_MAGNITUDE = [400, 300, 0]
+NUMBER_OF_PIECE_MAGNITUDE = [0, 0, 5]
+MOBILITY_MAGNITUDE = [200, 200, 0]
 ANTI_CORNER_SCORE = [1000.0, 1000.0, 0.0]
-CORNER_SCORE = [2000.0, 2000.0, 0]
+CORNER_SCORE = [10000.0, 10000.0, 0]
 EGDE_MAGNITUDE = [50, 50, 0]
 
 cache = {}
-DEPTH = 5
+DEPTH = 3
 
 
 class Othello(Game):
     def __init__(self, board=None):
-        super().__init__(SIZE, DEPTH, True, board)
+        super().__init__(SIZE, DEPTH, True, True, board)
         mid = SIZE // 2
         if board is None:
             self.board[mid - 1, mid - 1] = const.SECOND_PLAYER
@@ -61,16 +72,17 @@ class Othello(Game):
         if key in cache:
             return cache[key]
         all_moves = [(row, col) for col in range(SIZE) for row in range(SIZE) if self.valid_move((row, col), player)]
+        sorted(all_moves, key=lambda x: WEIGHT_MAP[x])
         cache[key] = all_moves
         return all_moves
 
     def is_end(self):
-        return np.all(self.board != const.EMPTY_CELL)
+        return np.count_nonzero(self.board != const.EMPTY_CELL) == self.size * self.size
 
     def apply_move(self, move, player):
         self.board[move] = player
         opponent = 1 + player % 2
-        for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1)]:
+        for dx, dy in DIRECTIONS:
             nx, ny = move[0] + dx, move[1] + dy
             to_flip = []
             if 0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx, ny] == opponent:
@@ -141,10 +153,8 @@ class Othello(Game):
                     else:
                         factor = 1
 
-                    if (nx, ny) == (1, 1):
-                        score = factor * (score + ANTI_CORNER_SCORE[game_time])
-                    else:
-                        score = factor * (score + ANTI_CORNER_SCORE[game_time]) / 2
+                    score = factor * (score + ANTI_CORNER_SCORE[game_time])
+
         return score
 
     def corner_heuristic(self, player, game_time):
@@ -161,7 +171,7 @@ class Othello(Game):
             edge_counts = np.array([
                 np.count_nonzero(self.board[0, 2:-2] == p),
                 np.count_nonzero(self.board[SIZE - 1, 2:-2] == p),
-                np.count_nonzero(self.board[2:-2, 0] == player),
+                np.count_nonzero(self.board[2:-2, 0] == p),
                 np.count_nonzero(self.board[2:-2, SIZE - 1] == p),
             ])
             return np.sum(edge_counts * EGDE_MAGNITUDE[game_time])
