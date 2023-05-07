@@ -7,8 +7,9 @@ import time
 
 
 class State:
-    def __init__(self, depth):
+    def __init__(self, depth, is_only_maximising):
         self.depth = depth
+        self.is_only_maximising = is_only_maximising
 
     def get_all_moves(self, player):
         pass
@@ -34,7 +35,7 @@ def max_value(state, player, depth, alpha=float('-inf'), beta=float('inf')):
     best_move = None
 
     for move in state.get_all_moves(player):
-        e, _ = min_value(state.copy().apply_move(tuple(move), player), 1 + player % 2, depth - 1, alpha, beta)
+        e, _ = min_value(state.copy().apply_move(move, player), 1 + player % 2, depth - 1, alpha, beta)
         if e > v:
             v = e
             best_move = move
@@ -90,5 +91,5 @@ def timer_decorator(func):
 @timer_decorator
 def alphabeta_search(state, player):
     return max_value(state, player, state.depth)[1] \
-        if player == const.FIRST_PLAYER \
+        if state.is_only_maximising or player == const.FIRST_PLAYER \
         else min_value(state, player, state.depth)[1]
