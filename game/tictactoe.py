@@ -1,7 +1,6 @@
 from generic_game import Game
 import const
 import numpy as np
-import hashlib
 
 SIZE = 3
 WIN = 1000.0
@@ -14,7 +13,7 @@ DEPTH = 6
 class Tictactoe(Game):
 
     def __init__(self, board=None):
-        super().__init__(SIZE, DEPTH, False, board)
+        super().__init__(SIZE, DEPTH, False, False, board)
 
     def valid_move(self, move, player=None):
         return super().valid_move(move) and self.board[move] == const.EMPTY_CELL
