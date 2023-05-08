@@ -7,6 +7,7 @@ import time
 
 
 class State:
+    total_elapsed_time = 0.0
     def __init__(self, depth, is_only_maximising):
         self.depth = depth
         self.is_only_maximising = is_only_maximising
@@ -73,18 +74,12 @@ def min_value(state, player, depth, alpha=float('-inf'), beta=float('inf')):
 
 def timer_decorator(func):
     def wrapper(*args, **kwargs):
-        # to do : changer plus tard
-        pr = cProfile.Profile()
-        pr.enable()
+        start_time = time.time()
         result = func(*args, **kwargs)
-        pr.disable()
-        pr.print_stats()
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        args[0].total_elapsed_time += elapsed_time
         return result
-        # t = time.time()
-        # result = func(*args, **kwargs)
-        # print(time.time() - t)
-        # return result
-
     return wrapper
 
 
