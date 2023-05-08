@@ -1,7 +1,10 @@
 from generic_game import Game
 import const
 import numpy as np
+import ctypes as ct
+import os
 
+OTHELLO_LIB = ct.CDLL(os.path.join(os.getcwd(), 'game/othello_c_lib/othello_lib.so'))
 DIRECTIONS = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1)]
 WEIGHT_MAP = np.array([
     [100, -25, 20, 10, 10, 20, -25, 100],
@@ -28,7 +31,7 @@ CORNER_SCORE = [10000.0, 10000.0, 0]
 EGDE_MAGNITUDE = [50, 50, 0]
 
 cache = {}
-DEPTH = 3
+DEPTH = 8
 
 
 class Othello(Game):
@@ -44,21 +47,24 @@ class Othello(Game):
     def valid_move(self, move, player=None):
         if not super().valid_move(move):
             return False
-        if self.board[move] != const.EMPTY_CELL:
-            return False
-        opponent = 1 + player % 2
-        directions = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1)]
 
-        for dx, dy in directions:
-            nx, ny = move[0] + dx, move[1] + dy
-            if 0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx, ny] == opponent:
-                while 0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx, ny] != const.EMPTY_CELL:
-                    nx += dx
-                    ny += dy
-                    if 0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx, ny] == player:
-                        return True
-
-        return False
+        res = OTHELLO_LIB.validMove(ct.c_void_p(self.board.ctypes.data), move[0], move[1], player)
+        return bool(res)
+        # if self.board[move] != const.EMPTY_CELL:
+        #     return False
+        # opponent = 1 + player % 2
+        # directions = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1)]
+        #
+        # for dx, dy in directions:
+        #     nx, ny = move[0] + dx, move[1] + dy
+        #     if 0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx, ny] == opponent:
+        #         while 0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx, ny] != const.EMPTY_CELL:
+        #             nx += dx
+        #             ny += dy
+        #             if 0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx, ny] == player:
+        #                 return True
+        #
+        # return False
 
     def count_piece(self, player):
         return np.count_nonzero(self.board == player)
@@ -75,26 +81,30 @@ class Othello(Game):
         sorted(all_moves, key=lambda x: WEIGHT_MAP[x])
         cache[key] = all_moves
         return all_moves
+        # without cache
+        # return [(row, col) for col in range(SIZE) for row in range(SIZE) if self.valid_move((row, col), player)]
 
     def is_end(self):
         return np.count_nonzero(self.board != const.EMPTY_CELL) == self.size * self.size
 
     def apply_move(self, move, player):
-        self.board[move] = player
-        opponent = 1 + player % 2
-        for dx, dy in DIRECTIONS:
-            nx, ny = move[0] + dx, move[1] + dy
-            to_flip = []
-            if 0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx, ny] == opponent:
-                while 0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx, ny] == opponent:
-                    to_flip.append((nx, ny))
-                    nx += dx
-                    ny += dy
-                if not (0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx, ny] == player):
-                    to_flip.clear()
-            for flip_row, flip_col in to_flip:
-                self.board[flip_row, flip_col] = player
+        OTHELLO_LIB.applyMove(ct.c_void_p(self.board.ctypes.data), move[0], move[1], player)
         return self
+        # self.board[move] = player
+        # opponent = 1 + player % 2
+        # for dx, dy in DIRECTIONS:
+        #     nx, ny = move[0] + dx, move[1] + dy
+        #     to_flip = []
+        #     if 0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx, ny] == opponent:
+        #         while 0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx, ny] == opponent:
+        #             to_flip.append((nx, ny))
+        #             nx += dx
+        #             ny += dy
+        #         if not (0 <= nx < SIZE and 0 <= ny < SIZE and self.board[nx, ny] == player):
+        #             to_flip.clear()
+        #     for flip_row, flip_col in to_flip:
+        #         self.board[flip_row, flip_col] = player
+        # return self
 
     def copy(self):
         return Othello(self.board.copy())

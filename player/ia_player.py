@@ -12,4 +12,6 @@ class IaPlayer(Player):
         # random.shuffle(moves)
         # return moves[0]
 
-        return alphabeta_search(game.copy(), self.player_number)
+        move = alphabeta_search(game.copy(), self.player_number)
+        print(f'player : {self.player_number} : move  {move}')
+        return move
