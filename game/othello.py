@@ -31,7 +31,7 @@ CORNER_SCORE = [10000.0, 10000.0, 0]
 EGDE_MAGNITUDE = [50, 50, 0]
 
 cache = {}
-DEPTH = 8
+DEPTH = 6
 
 
 class Othello(Game):

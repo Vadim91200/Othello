@@ -11,7 +11,9 @@ class IaPlayer(Player):
         # moves= board.get_all_moves(self.player_number)
         # random.shuffle(moves)
         # return moves[0]
-
-        move = alphabeta_search(game.copy(), self.player_number)
+        copyedgame = game.copy()
+        copyedgame.total_elapsed_time = game.total_elapsed_time
+        move = alphabeta_search(copyedgame, self.player_number)
         print(f'player : {self.player_number} : move  {move}')
+        game.total_elapsed_time = copyedgame.total_elapsed_time
         return move

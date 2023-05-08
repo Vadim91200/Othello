@@ -83,7 +83,7 @@ class GUI:
 
         if kwargs['score'][0]:
             self.announce_score(kwargs['score'][1])
-
+                    
         pygame.display.update()
         kwargs['menu'].update(events)
         kwargs['menu'].draw(self.surface)
@@ -108,6 +108,7 @@ class GUI:
 
         player_1_score = None
         player_2_score = None
+        total_time_label = None
         if played_game.show_live_score:
             game_menu.add.label('Score:', underline=True)
             frame1 = game_menu.add.frame_h(180, 110)
@@ -123,6 +124,11 @@ class GUI:
                 vertical_position=pygame_menu.locals.POSITION_CENTER)
 
             game_menu.add.vertical_margin(10)
+            
+            if self.player1[1] != 1 or self.player2[1] != 1:
+                game_menu.add.label('Total time:', underline=True)
+                total_time_label = game_menu.add.label(f'{played_game.total_elapsed_time:.2f} s')
+                game_menu.add.vertical_margin(10)
 
         game_menu.add.button('Rejouer', self.game_loop)
         game_menu.add.button('Menu principal', self.run)
@@ -150,6 +156,7 @@ class GUI:
                 'assets': assets
             }
             self.update(events, **update_info)
+            total_time_label.set_title(f'{played_game.total_elapsed_time:.2f} s')
 
             if not is_end and len(possible_moves) > 0:
                 move = players[current_player - 1].get_move(played_game,
