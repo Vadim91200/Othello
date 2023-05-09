@@ -1,13 +1,7 @@
-import cProfile
-import io
-import pstats
 import const
-import random
-import time
 
 
 class State:
-    total_elapsed_time = 0.0
     def __init__(self, depth, is_only_maximising):
         self.depth = depth
         self.is_only_maximising = is_only_maximising
@@ -72,18 +66,6 @@ def min_value(state, player, depth, alpha=float('-inf'), beta=float('inf')):
     return v, best_move
 
 
-def timer_decorator(func):
-    def wrapper(*args, **kwargs):
-        start_time = time.time()
-        result = func(*args, **kwargs)
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        args[0].total_elapsed_time += elapsed_time
-        return result
-    return wrapper
-
-
-@timer_decorator
 def alphabeta_search(state, player):
     return max_value(state, player, state.depth)[1] \
         if state.is_only_maximising or player == const.FIRST_PLAYER \

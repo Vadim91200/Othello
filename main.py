@@ -80,10 +80,11 @@ class GUI:
 
     def update(self, events, **kwargs):
         self.draw_board(kwargs['game'], kwargs['start_xy'], kwargs['possible_moves'], kwargs['assets'])
-
         if kwargs['score'][0]:
             self.announce_score(kwargs['score'][1])
-                    
+
+        # if kwargs['total_time_label']:
+        #     kwargs['total_time_label'].set_title(f'{TOTAL_ELAPSED_TIME:.2f} s')
         pygame.display.update()
         kwargs['menu'].update(events)
         kwargs['menu'].draw(self.surface)
@@ -105,30 +106,29 @@ class GUI:
             width=self.screen_width,
             height=self.screen_height
         )
+        players_total_time = [0, 0]
+        game_menu.add.label('Temps des joueurs:', underline=True).set_margin(-((self.screen_width / 2) * 0.75), 0)
+        frame1 = game_menu.add.frame_v(300, 110).set_margin(-((self.screen_width / 2) * 0.75), -100)
+        players_time_label = [frame1.pack(game_menu.add.label(f'Joueur 1: {players_total_time[0]:.2f} s').set_margin(0, 0)),
+                              frame1.pack(game_menu.add.label(f'Joueur 2: {players_total_time[1]:.2f} s').set_margin(0, 0))]
 
         player_1_score = None
         player_2_score = None
-        total_time_label = None
         if played_game.show_live_score:
             game_menu.add.label('Score:', underline=True)
-            frame1 = game_menu.add.frame_h(180, 110)
-            frame1.pack(game_menu.add.image(assets_path[0]).set_margin(0, 0))
-            player_1_score = frame1.pack(
+            frame2 = game_menu.add.frame_h(180, 110)
+            frame2.pack(game_menu.add.image(assets_path[0]).set_margin(0, 0))
+            player_1_score = frame2.pack(
                 game_menu.add.label(np.count_nonzero(played_game.board == const.FIRST_PLAYER)).set_margin(0, 0),
                 vertical_position=pygame_menu.locals.POSITION_CENTER)
 
-            frame2 = game_menu.add.frame_h(180, 110)
-            frame2.pack(game_menu.add.image(assets_path[1]).set_margin(0, 0), align=pygame_menu.locals.ALIGN_LEFT)
-            player_2_score = frame2.pack(
+            frame3 = game_menu.add.frame_h(180, 110)
+            frame3.pack(game_menu.add.image(assets_path[1]).set_margin(0, 0), align=pygame_menu.locals.ALIGN_LEFT)
+            player_2_score = frame3.pack(
                 game_menu.add.label(np.count_nonzero(played_game.board == const.FIRST_PLAYER)).set_margin(0, 0),
                 vertical_position=pygame_menu.locals.POSITION_CENTER)
 
             game_menu.add.vertical_margin(10)
-            
-            if self.player1[1] != 1 or self.player2[1] != 1:
-                game_menu.add.label('Total time:', underline=True)
-                total_time_label = game_menu.add.label(f'{played_game.total_elapsed_time:.2f} s')
-                game_menu.add.vertical_margin(10)
 
         game_menu.add.button('Rejouer', self.game_loop)
         game_menu.add.button('Menu principal', self.run)
@@ -156,13 +156,14 @@ class GUI:
                 'assets': assets
             }
             self.update(events, **update_info)
-            total_time_label.set_title(f'{played_game.total_elapsed_time:.2f} s')
 
             if not is_end and len(possible_moves) > 0:
-                move = players[current_player - 1].get_move(played_game,
-                                                            update_callback=lambda e: self.update(e, **update_info))
+                move, elapsed_time = players[current_player - 1].get_move(played_game, update_callback=lambda e: self.update(e, **update_info))
 
                 played_game.apply_move(move, current_player)
+
+                players_total_time[current_player - 1] += elapsed_time
+                players_time_label[current_player - 1].set_title(f'Joueur {current_player}: {players_total_time[0]:.2f} s')
 
                 if played_game.show_live_score:
                     player_1_score.set_title(str(np.count_nonzero(played_game.board == const.FIRST_PLAYER)))
