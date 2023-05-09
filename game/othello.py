@@ -35,6 +35,7 @@ DEPTH = 6
 
 
 class Othello(Game):
+    # Constructeur pour la classe Othello
     def __init__(self, board=None):
         super().__init__(SIZE, DEPTH, True, True, board)
         mid = SIZE // 2
