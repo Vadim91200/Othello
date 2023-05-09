@@ -1,4 +1,4 @@
-from generic_player import Player
+from generic_player import Player, timer_decorator
 import const
 import pygame
 
@@ -8,6 +8,7 @@ class HumanPlayer(Player):
     def __init__(self, player_number):
         super().__init__(player_number)
 
+    @timer_decorator
     def get_move(self, board, **kwargs):
         update_callback = kwargs['update_callback']
         clock = pygame.time.Clock()
