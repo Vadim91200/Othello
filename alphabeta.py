@@ -1,6 +1,7 @@
 import const
 
 
+# Classe représentant l'état du jeu pour l'algorithme Alpha-Beta
 class State:
     def __init__(self, depth, is_only_maximising):
         self.depth = depth
@@ -21,7 +22,7 @@ class State:
     def copy(self):
         pass
 
-
+#algorithme max
 def max_value(state, player, depth, alpha=float('-inf'), beta=float('inf')):
     if depth == 0 or state.is_end():
         return state.evaluate(player, depth), None
@@ -43,7 +44,7 @@ def max_value(state, player, depth, alpha=float('-inf'), beta=float('inf')):
 
     return v, best_move
 
-
+#algorithme min
 def min_value(state, player, depth, alpha=float('-inf'), beta=float('inf')):
     if depth == 0 or state.is_end():
         return state.evaluate(player, depth), None
@@ -66,6 +67,7 @@ def min_value(state, player, depth, alpha=float('-inf'), beta=float('inf')):
     return v, best_move
 
 
+#algorithme alpha-beta
 def alphabeta_search(state, player):
     return max_value(state, player, state.depth)[1] \
         if state.is_only_maximising or player == const.FIRST_PLAYER \

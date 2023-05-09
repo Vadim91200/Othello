@@ -4,10 +4,10 @@ import pygame
 
 
 class HumanPlayer(Player):
-
+    # Constructeur pour la classe Human
     def __init__(self, player_number):
         super().__init__(player_number)
-
+    # Méthode pour obtenir un mouvement d'un joueur humain
     @timer_decorator
     def get_move(self, board, **kwargs):
         update_callback = kwargs['update_callback']

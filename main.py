@@ -1,4 +1,4 @@
-import numpy as np
+﻿import numpy as np
 
 import const
 from factory import game_factory, player_factory, asset_factory
@@ -19,8 +19,8 @@ BORDER_COLOR = (54, 54, 54)
 
 class GUI:
     def __init__(self):
-        pygame.init()
-        self.clock = pygame.time.Clock()
+        pygame.init()  # Initialisation de pygame
+        self.clock = pygame.time.Clock() # Initialisation de l'horloge
         self.surface = pygame.display.set_mode((const.SCREEN_WIDTH, const.SCREEN_HEIGHT))
         display_info = pygame.display.Info()
         self.screen_width = display_info.current_w
@@ -38,6 +38,7 @@ class GUI:
         self.player2 = HUMAN
         self.game_type = OTHELLO
 
+        # Fonctions pour changer les param�tres de joueur et de mode de jeu
         def set_player1(selected_item, *_):
             self.player1 = selected_item[0]
 
@@ -47,6 +48,7 @@ class GUI:
         def set_game_type(selected_item, *_):
             self.game_type = selected_item[0]
 
+        # Création du menu et des s�lecteurs
         self.main_menu.add.selector(title='Joueur 1 : ', items=PLAYER_TYPES, onchange=set_player1)
         self.main_menu.add.selector(title='Joueur 2 : ', items=PLAYER_TYPES, onchange=set_player2)
         self.main_menu.add.selector(title='Mode de jeux : ', items=GAME_MODES, onchange=set_game_type)
@@ -56,6 +58,7 @@ class GUI:
     def run(self):
         self.main_menu.mainloop(self.surface)
 
+    # Dessiner le plateau de jeu
     def draw_board(self, board, start_xy, possible_moves, asset):
         for row in range(board.size):
             for col in range(board.size):
@@ -70,6 +73,7 @@ class GUI:
                 elif (row, col) in possible_moves:
                     self.surface.blit(asset[PLAYABLE_TILE_INDEX], (x, y))
 
+    # Annoncer le score à la fin du jeu
     def announce_score(self, player=None):
         font = pygame.font.Font(None, 80)
         text = f'Le joueur 1 gagne la partie' if player == 1 else 'Le joueur 2 gagne la partie' if player else 'Match nul !'
@@ -77,18 +81,20 @@ class GUI:
         text_x = (self.surface.get_width() - text_surface.get_width()) // 2
         text_y = (self.surface.get_height() - text_surface.get_height()) // 2
         self.surface.blit(text_surface, (text_x, text_y))
-
+    
+    # Mise à jour de l'affichage
     def update(self, events, **kwargs):
         self.draw_board(kwargs['game'], kwargs['start_xy'], kwargs['possible_moves'], kwargs['assets'])
         if kwargs['score'][0]:
             self.announce_score(kwargs['score'][1])
 
-        # if kwargs['total_time_label']:
-        #     kwargs['total_time_label'].set_title(f'{TOTAL_ELAPSED_TIME:.2f} s')
+         # if kwargs['total_time_label']:
+        #     kwargs['total_time_label'].set_title(f'{TOTAL_ELAPSED_TIME:.2f} s')           
         pygame.display.update()
         kwargs['menu'].update(events)
         kwargs['menu'].draw(self.surface)
-
+    
+    # Boucle principale du jeu
     def game_loop(self):
         assets_path = asset_factory(self.game_type[1])
         played_game = game_factory(self.game_type[1])
@@ -114,7 +120,7 @@ class GUI:
 
         player_1_score = None
         player_2_score = None
-        if played_game.show_live_score:
+        if played_game.show_live_score: # Mise à jour du score en direct pour les joueurs
             game_menu.add.label('Score:', underline=True)
             frame2 = game_menu.add.frame_h(180, 110)
             frame2.pack(game_menu.add.image(assets_path[0]).set_margin(0, 0))
@@ -143,7 +149,7 @@ class GUI:
         while True:
             self.clock.tick(const.FPS)
             events = pygame.event.get()
-            for event in events:
+            for event in events: # Gestion des événements et actions du joueur
                 if event.type == pygame.QUIT:
                     exit()
 
@@ -157,7 +163,7 @@ class GUI:
             }
             self.update(events, **update_info)
 
-            if not is_end and len(possible_moves) > 0:
+            if not is_end and len(possible_moves) > 0: # Mise à jour de l'affichage et vérification de la fin de partie
                 move, elapsed_time = players[current_player - 1].get_move(played_game, update_callback=lambda e: self.update(e, **update_info))
 
                 played_game.apply_move(move, current_player)
@@ -176,7 +182,7 @@ class GUI:
                         winner = const.SECOND_PLAYER
                     is_end = True
 
-            current_player = 1 + current_player % 2
+            current_player = 1 + current_player % 2 # Changement de joueur
             possible_moves = played_game.get_all_moves(current_player)
 
 

@@ -1,3 +1,4 @@
+# Constantes pour le jeu
 EMPTY_CELL = 0
 FIRST_PLAYER = 1
 SECOND_PLAYER = 2

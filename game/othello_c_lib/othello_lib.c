@@ -6,7 +6,7 @@
 #define SIZE 8
 #define EMPTY_CELL 0
 const int DIRECTIONS[8][2] = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}};
-
+// Vérifie si un coup est valide
 bool validMove(int board[SIZE][SIZE], int row, int col, int player) {
     if(board[row][col] != EMPTY_CELL)
         return false;
@@ -32,7 +32,7 @@ bool validMove(int board[SIZE][SIZE], int row, int col, int player) {
 
     return false;
 }
-
+// Applique un coup sur le plateau place le pion et retourne les pions adverse
 void applyMove(int board[SIZE][SIZE], int row, int col, int player) {
     board[row][col] = player;
 
@@ -67,7 +67,7 @@ void applyMove(int board[SIZE][SIZE], int row, int col, int player) {
         }
     }
 }
-
+// Libère la mémoire allouée pour un tableau
 void freeArray(int **array, int row, int col) {
     for (int i = 0; i < row; i++) {
         free(array[i]);
