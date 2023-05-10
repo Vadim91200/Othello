@@ -112,7 +112,7 @@ class GUI:
             width=self.screen_width,
             height=self.screen_height
         )
-        players_total_time = [0, 0]
+        players_total_time = [0.0, 0.0]
         game_menu.add.label('Temps des joueurs:', underline=True).set_margin(-((self.screen_width / 2) * 0.75), 0)
         frame1 = game_menu.add.frame_v(300, 110).set_margin(-((self.screen_width / 2) * 0.75), -100)
         players_time_label = [frame1.pack(game_menu.add.label(f'Joueur 1: {players_total_time[0]:.2f} s').set_margin(0, 0)),
@@ -169,7 +169,7 @@ class GUI:
                 played_game.apply_move(move, current_player)
 
                 players_total_time[current_player - 1] += elapsed_time
-                players_time_label[current_player - 1].set_title(f'Joueur {current_player}: {players_total_time[0]:.2f} s')
+                players_time_label[current_player - 1].set_title(f'Joueur {current_player}: {players_total_time[current_player - 1]:.2f} s')
 
                 if played_game.show_live_score:
                     player_1_score.set_title(str(np.count_nonzero(played_game.board == const.FIRST_PLAYER)))
