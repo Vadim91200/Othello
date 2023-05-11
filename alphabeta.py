@@ -22,7 +22,8 @@ class State:
     def copy(self):
         pass
 
-#algorithme max
+
+# algorithme max
 def max_value(state, player, depth, alpha=float('-inf'), beta=float('inf')):
     if depth == 0 or state.is_end():
         return state.evaluate(player, depth), None
@@ -44,7 +45,8 @@ def max_value(state, player, depth, alpha=float('-inf'), beta=float('inf')):
 
     return v, best_move
 
-#algorithme min
+
+# algorithme min
 def min_value(state, player, depth, alpha=float('-inf'), beta=float('inf')):
     if depth == 0 or state.is_end():
         return state.evaluate(player, depth), None
@@ -67,7 +69,8 @@ def min_value(state, player, depth, alpha=float('-inf'), beta=float('inf')):
     return v, best_move
 
 
-#algorithme alpha-beta
+# algorithme alpha-beta
+# l'algorithme a été modifié afin qu'il puisse capturer le score et le coup par la même occasion
 def alphabeta_search(state, player):
     return max_value(state, player, state.depth)[1] \
         if state.is_only_maximising or player == const.FIRST_PLAYER \

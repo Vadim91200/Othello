@@ -88,8 +88,6 @@ class GUI:
         if kwargs['score'][0]:
             self.announce_score(kwargs['score'][1])
 
-         # if kwargs['total_time_label']:
-        #     kwargs['total_time_label'].set_title(f'{TOTAL_ELAPSED_TIME:.2f} s')           
         pygame.display.update()
         kwargs['menu'].update(events)
         kwargs['menu'].draw(self.surface)

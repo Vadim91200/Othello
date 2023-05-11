@@ -3,7 +3,11 @@ import const
 import numpy as np
 from numba import njit
 
+# Point cardinal sud, est, ouest, nord, etc...
 DIRECTIONS = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1)]
+# Representation du tablier 8x8 du jeu avec un score arbitraire à chaque case
+# Ce tablier permet de trier une première fois les coups possibles afin d'augmenter les chances de donner
+# au minmax alphabeta un coup puissant en premier et ainsi optimiser l'elagage.
 WEIGHT_MAP = np.array([
     [100, -25, 20, 10, 10, 20, -25, 100],
     [-25, -25, 5, 5, 5, 5, -25, -25],
@@ -16,20 +20,31 @@ WEIGHT_MAP = np.array([
 ])
 
 SIZE = 8
+# Heuristique de victoire, defaite et nul
 WIN = 100000000.0
 LOSS = -100000000.0
 DRAW = 0.0
+# Etat de la partie (debut, milieu et fin) et aussi index pour les scores d'heuristic
 EARLY_GAME = 0
 MID_GAME = 1
 END_GAME = 2
+# heuristique pour le nombre de pion (active en fin de partie)
 NUMBER_OF_PIECE_MAGNITUDE = [0, 0, 5]
+# heuristique pour le nombre de coup possible pour un joueur
+# on veut maximiser pour le joueur actif et minimiser pour l'opposant
 MOBILITY_MAGNITUDE = [200, 200, 0]
+# Heuristique pour les cases adjacentes aux coins (on cherche à eviter ces cases mais elles restent jouables)
 ANTI_CORNER_SCORE = [1000.0, 1000.0, 0.0]
+# Heuristique strategique pour les coins, ce sont des cases très importante car elles apportent une stabilité et son
+# imprenable
 CORNER_SCORE = [10000.0, 10000.0, 0]
+# Heuristique pour les bords (sans les coins et anti-coins), ce sont des cases stables est importante.
 EGDE_MAGNITUDE = [50, 50, 0]
-
+# Le cache permet de stocker pour un etat de l'othello et le joueur en cours le calcul des coups possibles l'objectif
+# est d'eviter de recalculer tout les coups possibles d'un etat s'il est deja present dans le cache (gain de vitesse)
 cache = {}
-DEPTH = 6
+# profondeur pour le minmax (à faire varier entre 4 et 6)
+DEPTH = 4
 
 
 class Othello(Game):
@@ -61,7 +76,7 @@ class Othello(Game):
         if key in cache:
             return cache[key]
         all_moves = [(row, col) for col in range(SIZE) for row in range(SIZE) if self.valid_move((row, col), player)]
-        sorted(all_moves, key=lambda x: WEIGHT_MAP[x])
+        all_moves.sort(key=lambda xy: WEIGHT_MAP[xy], reverse=True)
         cache[key] = all_moves
         return all_moves
 
@@ -116,6 +131,7 @@ class Othello(Game):
 
     def anti_corner_heuristic(self, player, game_time):
         score = 0
+        # Calcul les positions des anti-coins, si c'est case sont occupés par le joueur actuel le score baisse
         for x, y in [(0, 0), (0, SIZE - 1), (SIZE - 1, 0), (SIZE - 1, SIZE - 1)]:
             if self.board[x, y] == const.EMPTY_CELL:
                 for nx, ny in [(1, 0), (1, 1), (0, 1)]:
@@ -143,6 +159,7 @@ class Othello(Game):
         return score
 
     def edge_heuristic(self, player, game_time):
+        # Calcul pour bord du tableau sans les coins et anti-coins
         def get_score(p):
             edge_counts = np.array([
                 np.count_nonzero(self.board[0, 2:-2] == p),
@@ -157,6 +174,10 @@ class Othello(Game):
         return score
 
 
+# numba est une librairie qui traduit une fonction python vers du c++ avec les meilleurs flags d'optimisation
+# cette librairie aime particulierement les boucles et la librairie numpy mais deteste les classes customs et objet
+# difficile à traduire vers du c++
+# Toujours dans l'objectif de gagner en vitesse.
 @njit
 def fast_valid_move(board, move, player):
     if board[move] != const.EMPTY_CELL:
@@ -176,6 +197,7 @@ def fast_valid_move(board, move, player):
     return False
 
 
+# Applique un coup à un array numpy et cacul la logique des règles de l'othello pour retourner les pieces ennemies.
 @njit
 def fast_apply_move(board, move, player):
     board[move] = player

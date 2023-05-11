@@ -41,6 +41,7 @@ class Tictactoe(Game):
         all_moves = [(row, col) for col in range(SIZE) for row in range(SIZE) if self.valid_move((row, col), player)]
         cache[bytes_board] = all_moves
         return all_moves
+
     # heuristique de l'algorithme Tictactoe
     def evaluate(self, player, depth):
         if self.check_win(const.FIRST_PLAYER):
